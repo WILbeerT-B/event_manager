@@ -205,6 +205,7 @@ end
 =end
 
 #Assignment: Clean phone numbers
+=begin
 require 'csv'
 
 def clean_phone(phone)
@@ -244,3 +245,61 @@ contents.each do |row|
   
   puts "#{name} #{phone}"
 end
+=end
+
+#Assignment: Time targeting
+
+require 'csv'
+require 'time'
+
+
+
+puts 'EventManager initialized.'
+
+contents = CSV.open(
+  'event_attendees.csv',
+  headers: true,
+  header_converters: :symbol
+)
+all_hours = []
+contents.each do |row|
+  zipcode = row[:zipcode]
+  reg_date = row[:regdate]
+  space = reg_date.index(' ')
+  #get the date from the string
+  date = reg_date[0..space-1]
+  #get the time from the string
+  time = reg_date[space+1..reg_date.length]
+  #split the date
+  s_date = date.split('/')
+  #fix the format of the date to year/month/day
+  s_date[0], s_date[1], s_date[2] = s_date[2], s_date[0], s_date[1]
+  #put together the date as a string
+  f_date = s_date.join('/')
+  
+  #Using the registration date and time we want to find out what 
+  #the peak registration hours are.
+
+  #create the Time object
+  my_date = Time.parse(f_date +" "+ time)
+  
+  #To get the peak registration hours, get the hours from date
+  hours = my_date.strftime("%k")
+  #fix the hours
+  if hours.include?(" ")
+    hours = hours.gsub(" ", "0")
+  end
+  all_hours = all_hours.push(hours)  
+end
+#count the number of occurences of each hour
+
+def get_peak(hours)
+  hours.reduce(Hash.new(0)) do |result, hr|
+    result[hr] += 1
+    result
+  end
+end
+
+peak = get_peak(all_hours)
+puts peak
+
