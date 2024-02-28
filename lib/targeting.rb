@@ -17,10 +17,11 @@ all_days = []
 contents.each do |row|
   zipcode = row[:zipcode]
   reg_date = row[:regdate]
+  #get the index of space
   space = reg_date.index(' ')
-  #get the date from the string
+  #get the date from the string regdate
   date = reg_date[0..space-1]
-  #get the time from the string
+  #get the time from the string regdate
   time = reg_date[space+1..reg_date.length]
   #split the date
   s_date = date.split('/')
@@ -30,23 +31,23 @@ contents.each do |row|
   f_date = s_date.join('/')
   
   #Using the registration date and time we want to find out what 
-  #the peak registration hours are.
+  #the peak registration hours / days are.
 
   #create the Time object
   my_date = Time.parse(f_date +" "+ time)
 
   #To get the peak registration hours, get the hours from date
   hours = my_date.strftime("%k")
+  
   #fix the hours
-  if hours.include?(" ")
-    hours = hours.gsub(" ", "0")
-  end
-  all_hours = all_hours.push(hours)
+  hours = hours.gsub(" ", "0") if hours.include?(" ")
 
-  days = my_date.wday 
-  s_days = days.to_s.split()
-  for i in 0..s_days.length-1 do
-    day_of_week = case s_days[i]
+  #push hours to all_hours array
+  all_hours.push(hours)
+
+  days = my_date.wday.to_s.split()
+  for i in 0..days.length-1 do
+    day_of_week = case days[i]
       when '0' then "Sunday"
       when '1' then "Monday"
       when '2' then "Tuesday"
@@ -57,7 +58,8 @@ contents.each do |row|
     end
     #puts day_of_week
   end
-  all_days = all_days.push(day_of_week)
+  #push days to all_days array
+  all_days.push(day_of_week)
 end
 
 #method to count the number of occurences of each hour/day
@@ -68,11 +70,21 @@ def check_peak(nums)
   end
 end
 
-peak_hour = check_peak(all_hours)
-puts peak_hour
-#get the peak hours
-peak_hour.each { |k, v| puts k if v == peak_hour.values.max }
+#method to get the peak hours / days
+def get_peak(nums)
+  nums.each { |k, v| puts k if v == nums.values.max }
+end
 
-peak_day = check_peak(all_days)
-puts peak_day
-peak_day.each { |k, v| puts k if v == peak_day.values.max }
+#get the peak hours
+hours_peak = check_peak(all_hours)
+#puts hours_peak
+puts "Peak Hours:"
+peak_hours = get_peak(hours_peak)
+#puts peak_hours
+
+#get the peak days
+days_peak = check_peak(all_days)
+#puts days_peak
+puts "Peak Days:"
+peak_days = get_peak(days_peak)
+#puts peak_days
